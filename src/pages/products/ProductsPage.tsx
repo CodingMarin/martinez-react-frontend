@@ -5,9 +5,8 @@ import {
   useDeleteProduct,
 } from "../../hooks/useProducts";
 import { ProductForm } from "../../components/forms/ProductForm";
-import { ProductList } from "../../components/ProductList";
-import { ProductGrid } from "../../components/ProductGrid";
 import type { Product, CreateProductDto } from "../../types/product";
+import { ProductTable } from "../../components/tables/ProductTable";
 
 export const ProductsPage = () => {
   const [page, setPage] = useState(1);
@@ -15,20 +14,10 @@ export const ProductsPage = () => {
 
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   const { data, isLoading, error } = useProducts({ page, limit });
   const createProduct = useCreateProduct();
   const deleteProduct = useDeleteProduct();
-
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleLimitChange = (newLimit: number) => {
-    setLimit(newLimit);
-    setPage(1); // Reset to first page
-  };
 
   const handleCreateProduct = async (data: CreateProductDto) => {
     try {
@@ -37,7 +26,6 @@ export const ProductsPage = () => {
       setEditingProduct(null);
     } catch (error) {
       console.error("Error creating product:", error);
-      // Opcional: mostrar toast de error
     }
   };
 
@@ -51,7 +39,6 @@ export const ProductsPage = () => {
       await deleteProduct.mutateAsync(productId);
     } catch (error) {
       console.error("Error deleting product:", error);
-      // Opcional: mostrar toast de error
     }
   };
 
@@ -96,30 +83,6 @@ export const ProductsPage = () => {
         </div>
 
         <div className="flex space-x-3">
-          {/* Toggle View Mode */}
-          <div className="flex rounded-lg border border-gray-300">
-            <button
-              onClick={() => setViewMode("table")}
-              className={`px-4 py-2 text-sm font-medium ${
-                viewMode === "table"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-50"
-              } rounded-l-lg border-r border-gray-300`}
-            >
-              Tabla
-            </button>
-            <button
-              onClick={() => setViewMode("grid")}
-              className={`px-4 py-2 text-sm font-medium ${
-                viewMode === "grid"
-                  ? "bg-blue-500 text-white"
-                  : "bg-white text-gray-700 hover:bg-gray-50"
-              } rounded-r-lg`}
-            >
-              Tarjetas
-            </button>
-          </div>
-
           <button
             onClick={() => {
               setEditingProduct(null);
@@ -158,29 +121,22 @@ export const ProductsPage = () => {
         </div>
       )}
 
-      {data ? (
-        viewMode === "table" ? (
-          <ProductList
+      <div className="hidden md:block">
+        {data && (
+          <ProductTable
             data={data}
             onEdit={handleEditProduct}
             onDelete={handleDeleteProduct}
-            onPageChange={handlePageChange}
-            onLimitChange={handleLimitChange}
+            onPageChange={setPage}
+            onLimitChange={setLimit}
           />
-        ) : (
-          <ProductGrid
-            data={data}
-            onEdit={handleEditProduct}
-            onDelete={handleDeleteProduct}
-            onPageChange={handlePageChange}
-            onLimitChange={handleLimitChange}
-          />
-        )
-      ) : (
-        <div className="text-center py-8 text-gray-500">
-          <p>No hay datos disponibles</p>
-        </div>
-      )}
+        )}
+      </div>
+      <div className="md:hidden">
+        {/** Proximament:
+         * Mostrar cards para vista mobile
+         */}
+      </div>
     </div>
   );
 };
