@@ -1,5 +1,5 @@
 import api from "./api";
-import type { Product, CreateProductDto } from "../types/product";
+import type { Product, CreateProductDto } from "@/types/product";
 import type { PaginatedResponse, PaginationParams } from "@/types/paginated";
 
 export const productService = {

@@ -3,10 +3,10 @@ import {
   useProducts,
   useCreateProduct,
   useDeleteProduct,
-} from "../../hooks/useProducts";
-import { ProductForm } from "../../components/forms/ProductForm";
-import type { Product, CreateProductDto } from "../../types/product";
-import { ProductTable } from "../../components/tables/ProductTable";
+} from "@hooks/useProducts";
+import { ProductForm } from "@components/forms/ProductForm";
+import type { Product, CreateProductDto } from "@/types/product";
+import { ProductTable } from "@components/tables/ProductTable";
 
 export const ProductsPage = () => {
   const [page, setPage] = useState(1);

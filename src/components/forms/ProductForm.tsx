@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect } from "react";
-import type { CreateProductDto, Product } from "../../types/product";
+import type { CreateProductDto, Product } from "@/types/product";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
@@ -11,8 +11,8 @@ const productSchema = z.object({
   price: z.number().positive("Precio debe ser positivo"),
   stock: z.number().min(0, "Stock no puede ser negativo"),
   sku: z.string().optional(),
-  measureId: z.string().uuid("ID de medida inválido"),
-  categoryId: z.string().uuid("ID de categoría inválido"),
+  measureId: z.string(),
+  categoryId: z.string(),
 });
 
 interface ProductFormProps {

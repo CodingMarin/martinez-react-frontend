@@ -1,6 +1,6 @@
 import { type ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../ui/DataTable";
-import type { Product } from "../../types/product";
+import { DataTable } from "@components/ui/DataTable";
+import type { Product } from "@/types/product";
 import type { PaginatedResponse } from "@/types/paginated";
 
 interface ProductTableProps {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Product } from "../types/product";
+import type { Product } from "@/types/product";
 import type { PaginatedResponse } from "@/types/paginated";
 
 interface ProductListProps {

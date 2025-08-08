@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { productService } from "../services/productService";
-import type { CreateProductDto } from "../types/product";
+import type { CreateProductDto } from "@/types/product";
 import type { PaginationParams } from "@/types/paginated";
 
 export const useProducts = (params?: PaginationParams) => {
