@@ -1,8 +1,10 @@
 import { DataTable } from "@components/ui/DataTable";
 import type { ProformaResponse } from "@/types/proforma";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Eye, File } from "lucide-react";
+import { FileDown, FileText, Loader2 } from "lucide-react";
 import type { PaginatedResponse } from "@/types/paginated";
+import { useGeneratePDF, usePreviewHTML } from "@/hooks/useProformas";
+import { useState } from "react";
 
 interface ProductTableProps {
   data: PaginatedResponse<ProformaResponse>;
@@ -14,6 +16,37 @@ export const ProformaTable = ({
   onPageChange,
   onLimitChange,
 }: ProductTableProps) => {
+  const generatePDF = useGeneratePDF();
+  const previewMutation = usePreviewHTML();
+
+  const [loadingPDF, setLoadingPDF] = useState<string | null>(null);
+  const [loadingPreview, setLoadingPreview] = useState<string | null>(null);
+
+  const handleGeneratePDF = async (proformaId: string) => {
+    setLoadingPDF(proformaId);
+    try {
+      await generatePDF.mutateAsync(proformaId);
+    } finally {
+      setLoadingPDF(null);
+    }
+  };
+
+  const handlePreview = async (proformaId: string) => {
+    setLoadingPreview(proformaId);
+    try {
+      const html = await previewMutation.mutateAsync(proformaId);
+      const newWindow = window.open("", "_blank");
+      if (newWindow) {
+        newWindow.document.write(html);
+        newWindow.document.close();
+      }
+    } catch (error) {
+      console.error("Error generating preview:", error);
+    } finally {
+      setLoadingPreview(null);
+    }
+  };
+
   const columns: ColumnDef<ProformaResponse>[] = [
     {
       accessorKey: "numberProforma",
@@ -71,24 +104,52 @@ export const ProformaTable = ({
     {
       id: "actions",
       header: "Acciones",
-      cell: () => (
-        <div className="flex justify-end space-x-2">
-          <button
-            onClick={() => {}}
-            className="text-indigo-600 flex items-center gap-2 hover:text-indigo-900 px-2 py-1 rounded transition-colors text-sm font-medium"
-          >
-            <Eye className="w-5 h-5" />
-            Detalles
-          </button>
-          <button
-            onClick={() => {}}
-            className="text-blue-600 flex items-center gap-2 hover:text-blue-900 px-2 py-1 rounded transition-colors text-sm font-medium"
-          >
-            <File className="w-5 h-5" />
-            Generar PDF
-          </button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const isGeneratingPDF = loadingPDF === row.original.id;
+        const isGeneratingPreview = loadingPreview === row.original.id;
+
+        return (
+          <div className="flex justify-end space-x-2">
+            <button
+              onClick={() => handlePreview(row.original.id)}
+              disabled={isGeneratingPreview}
+              className="text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 text-sm font-medium"
+              title="Vista previa del PDF"
+            >
+              {isGeneratingPreview ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>
+                  <FileText className="w-4 h-4" />
+                  Preview
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={() => handleGeneratePDF(row.original.id)}
+              disabled={isGeneratingPDF}
+              className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 flex items-center gap-2 px-3 py-1.5 rounded-md transition-all duration-200 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Generar y descargar PDF"
+            >
+              {isGeneratingPDF ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Generando...
+                </>
+              ) : (
+                <>
+                  <FileDown className="w-4 h-4" />
+                  Generar PDF
+                </>
+              )}
+            </button>
+          </div>
+        );
+      },
     },
   ];
 
