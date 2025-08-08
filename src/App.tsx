@@ -1,16 +1,8 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { ProductsPage } from "@pages/products/ProductsPage";
+import { RouterProvider } from "react-router-dom";
+import Routes from "@/Routes";
 
 function App() {
-  return (
-    <Router>
-      <div className="min-h-screen bg-gray-50">
-        <Routes>
-          <Route path="/products" element={<ProductsPage />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+  return <RouterProvider router={Routes} />;
 }
 
 export default App;

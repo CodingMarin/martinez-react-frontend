@@ -11,6 +11,8 @@ export default defineConfig({
       "@components": resolve(__dirname, "src/components"),
       "@pages": resolve(__dirname, "src/pages"),
       "@hooks": resolve(__dirname, "src/hooks"),
+      "@layouts": resolve(__dirname, "src/layouts"),
+      "@utils": resolve(__dirname, "src/utils"),
     },
   },
   build: {

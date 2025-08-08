@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { useState } from "react";
 import type { PaginatedResponse } from "@/types/paginated";
+import { cn } from "@/utils/cn";
 
 interface DataTableProps<T> {
   data: PaginatedResponse<T>;
@@ -79,7 +80,7 @@ export function DataTable<T>({
 
   return (
     <div
-      className={`bg-white shadow-md rounded-lg overflow-hidden ${className}`}
+      className={cn("bg-white shadow-md rounded-lg overflow-hidden", className)}
     >
       {enableGlobalFilter && (
         <div className="p-4 border-b border-gray-200">
@@ -87,7 +88,7 @@ export function DataTable<T>({
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="Buscar en todos los campos..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       )}
