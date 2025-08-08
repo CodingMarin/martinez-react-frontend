@@ -1,30 +1,58 @@
 import { useState } from "react";
-import { useProducts, useCreateProduct } from "../../hooks/useProducts";
+import {
+  useProducts,
+  useCreateProduct,
+  useDeleteProduct,
+} from "../../hooks/useProducts";
 import { ProductForm } from "../../components/forms/ProductForm";
 import { ProductList } from "../../components/ProductList";
 import { ProductGrid } from "../../components/ProductGrid";
 import type { Product, CreateProductDto } from "../../types/product";
 
 export const ProductsPage = () => {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
-  const { data: products, isLoading, error } = useProducts();
+  const { data, isLoading, error } = useProducts({ page, limit });
   const createProduct = useCreateProduct();
+  const deleteProduct = useDeleteProduct();
+
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1); // Reset to first page
+  };
 
   const handleCreateProduct = async (data: CreateProductDto) => {
     try {
       await createProduct.mutateAsync(data);
       setShowForm(false);
+      setEditingProduct(null);
     } catch (error) {
       console.error("Error creating product:", error);
+      // Opcional: mostrar toast de error
     }
   };
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setShowForm(true);
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct.mutateAsync(productId);
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      // Opcional: mostrar toast de error
+    }
   };
 
   if (isLoading)
@@ -37,7 +65,16 @@ export const ProductsPage = () => {
   if (error)
     return (
       <div className="text-center text-red-600 p-8">
-        Error al cargar productos: {error.message}
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 max-w-md mx-auto">
+          <h3 className="font-semibold mb-2">Error al cargar productos</h3>
+          <p className="text-sm">{error.message}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-3 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
+          >
+            Reintentar
+          </button>
+        </div>
       </div>
     );
 
@@ -50,6 +87,12 @@ export const ProductsPage = () => {
           <p className="text-gray-600 mt-1">
             Gestiona tu inventario de productos
           </p>
+          {/* Mostrar info de paginación en el header */}
+          {data && (
+            <p className="text-sm text-gray-500 mt-1">
+              {data.meta.totalItems} productos en total
+            </p>
+          )}
         </div>
 
         <div className="flex space-x-3">
@@ -101,7 +144,7 @@ export const ProductsPage = () => {
                 setShowForm(false);
                 setEditingProduct(null);
               }}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 text-xl font-bold w-8 h-8 flex items-center justify-center rounded hover:bg-gray-100"
             >
               ✕
             </button>
@@ -115,18 +158,28 @@ export const ProductsPage = () => {
         </div>
       )}
 
-      {viewMode === "table" ? (
-        <ProductList
-          products={products || []}
-          onEdit={handleEditProduct}
-          onDelete={() => {}}
-        />
+      {data ? (
+        viewMode === "table" ? (
+          <ProductList
+            data={data}
+            onEdit={handleEditProduct}
+            onDelete={handleDeleteProduct}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+          />
+        ) : (
+          <ProductGrid
+            data={data}
+            onEdit={handleEditProduct}
+            onDelete={handleDeleteProduct}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+          />
+        )
       ) : (
-        <ProductGrid
-          products={products || []}
-          onEdit={handleEditProduct}
-          onDelete={() => {}}
-        />
+        <div className="text-center py-8 text-gray-500">
+          <p>No hay datos disponibles</p>
+        </div>
       )}
     </div>
   );
