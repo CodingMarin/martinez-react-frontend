@@ -81,10 +81,10 @@ export const ProductTable = ({
       },
     },
     {
-      accessorFn: (row) => row.measure?.name,
+      accessorFn: (row) => row.measure,
       id: "measure",
       header: "Unidad",
-      cell: ({ getValue }) => (getValue() as string) || "Sin unidad",
+      cell: ({ getValue }) => getValue() || "Sin unidad",
     },
     {
       accessorKey: "sku",

@@ -124,7 +124,7 @@ export const ProductList = ({
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {product.measure?.name || "Sin unidad"}
+                  {product.measure}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {product.sku || "-"}

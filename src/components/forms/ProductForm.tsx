@@ -2,7 +2,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useEffect } from "react";
-import type { CreateProductDto, Product } from "@/types/product";
+import {
+  UnitMeasure,
+  type CreateProductDto,
+  type Product,
+} from "@/types/product";
+import { getUnitMeasureDescription } from "@/utils/measure";
 
 const productSchema = z.object({
   name: z.string().min(1, "Nombre requerido"),
@@ -12,7 +17,7 @@ const productSchema = z.object({
   price: z.number().positive("Precio debe ser positivo"),
   stock: z.number().min(0, "Stock no puede ser negativo"),
   sku: z.string().optional(),
-  measureId: z.string().optional(),
+  unitMeasure: z.enum(UnitMeasure),
   categoryId: z.string().optional(),
 });
 
@@ -43,6 +48,7 @@ export const ProductForm = ({
       price: 0,
       stock: 0,
       sku: "",
+      unitMeasure: UnitMeasure.UNIDAD,
     },
   });
 
@@ -55,6 +61,7 @@ export const ProductForm = ({
       setValue("price", initialData.price);
       setValue("stock", initialData.stock || 0);
       setValue("sku", initialData.sku || "");
+      setValue("unitMeasure", initialData.measure);
     } else {
       reset({
         name: "",
@@ -64,6 +71,7 @@ export const ProductForm = ({
         price: 0,
         stock: 0,
         sku: "",
+        unitMeasure: UnitMeasure.UNIDAD,
       });
     }
   }, [initialData, setValue, reset]);
@@ -180,6 +188,28 @@ export const ProductForm = ({
           )}
         </div>
       </div>
+
+      <div className="transition-all duration-200 delay-[550ms] ease-out starting:open:opacity-0 starting:open:translate-y-2 open:opacity-100 open:translate-y-0">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Unidad de medida *
+        </label>
+        <select
+          {...register("unitMeasure")}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+        >
+          {Object.values(UnitMeasure).map((unit) => (
+            <option key={unit} value={unit}>
+              {getUnitMeasureDescription(unit)}
+            </option>
+          ))}
+        </select>
+        {errors.unitMeasure && (
+          <span className="text-red-500 text-sm mt-1">
+            {errors.unitMeasure.message}
+          </span>
+        )}
+      </div>
+
       <div className="transition-all duration-200 delay-[650ms] ease-out starting:open:opacity-0 starting:open:translate-y-2 open:opacity-100 open:translate-y-0">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Descripción
